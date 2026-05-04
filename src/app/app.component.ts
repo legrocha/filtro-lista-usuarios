@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { UsersList } from './data/user-list';
 import { IUser } from './interfaces/user/user.interface';
+import { IFilterOptions } from './interfaces/filter-options.interface';
 
 @Component({
   selector: 'app-root',
@@ -9,16 +10,42 @@ import { IUser } from './interfaces/user/user.interface';
 })
 export class AppComponent implements OnInit {
   usersList: IUser[] = [];
+  usersListFiltered: IUser[] = [];
   userSelected: IUser = {} as IUser;
   showUserDetails: boolean = false;
 
   ngOnInit() {
     setTimeout(() => {
-      this.usersList = UsersList
-    }, 3000);
+      this.usersList = UsersList;
+      this.usersListFiltered = this.usersList;
+    }, 1000); //Simulacao de chamada HTTP
   }
   onUserSelected(user: IUser) {
     this.userSelected = user;
     this.showUserDetails = true;
+  }
+
+  onFilter(filterOptions: IFilterOptions) {
+    console.log(filterOptions);
+
+    this.usersListFiltered = this.filterUsersList(filterOptions, this.usersList);
+  }
+  filterUsersList(filterOptions: IFilterOptions, usersList: IUser[]): IUser[] {
+    let filteredList: IUser[] = [];
+
+    filteredList = this.filteUsersListByName(filterOptions.name, usersList);
+
+    return filteredList;
+  }
+  filteUsersListByName(name: string | undefined, usersList: IUser[]): IUser[] {
+    const NAME_NOT_TYPED = name === undefined;
+
+    if(NAME_NOT_TYPED) {
+      return usersList;
+    }
+
+    const filteredList = usersList.filter(user => user.nome.toLowerCase().includes(name.toLowerCase()));
+
+    return filteredList;
   }
 }
